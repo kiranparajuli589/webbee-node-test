@@ -1,4 +1,6 @@
 import Event from './entities/event.entity';
+import Workshop from './entities/workshop.entity';
+import Sequelize, { Op } from 'sequelize';
 
 
 export class EventsService {
@@ -85,10 +87,26 @@ export class EventsService {
      */
 
   async getEventsWithWorkshops() {
-    throw new Error('TODO task 1');
-  }
+    const events =  await Event.findAll({raw: true});
+    const eventsWithWorkshops = await Promise.all(events.map(async event => {
+      const workshops = await Workshop.findAll({raw: true, where: {eventId: event.id}})
+      return {...event, workshops}
+    }))
+    return eventsWithWorkshops
 
-  /* TODO: complete getFutureEventWithWorkshops so that it returns events with workshops, that have not yet started
+
+    // return await Event.findAll({
+    //   raw: true,
+    //   include: [
+    //     {
+    //       model: Workshop,
+    //       as: 'workshops',          
+    //     },
+    //   ],
+    // });
+  }
+  async getFutureEventWithWorkshops() {
+     /* TODO: complete getFutureEventWithWorkshops so that it returns events with workshops, that have not yet started
     Requirements:
     - only events that have not yet started should be included
     - the event starting time is determined by the first workshop of the event
@@ -154,7 +172,5 @@ export class EventsService {
     ]
     ```
      */
-  async getFutureEventWithWorkshops() {
-    throw new Error('TODO task 2');
   }
 }

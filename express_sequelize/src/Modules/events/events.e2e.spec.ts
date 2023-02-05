@@ -34,6 +34,7 @@ describe('events', () => {
     const result = response.body;
 
     expect(result.length).toBe(3);
+    console.log(result)
     expect(result[0].name).toBe('Laravel convention ' + date1);
     expect(result[0].workshops[0].name).toBe(
       'Illuminate your knowledge of the laravel code base',
