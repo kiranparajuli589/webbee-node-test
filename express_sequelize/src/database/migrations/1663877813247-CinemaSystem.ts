@@ -1,4 +1,5 @@
 import { QueryInterface } from 'sequelize';
+import Sequelize from 'sequelize';
 
 export default {
   /**
@@ -32,7 +33,115 @@ export default {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   up: (queryInterface: QueryInterface): Promise<void> => {
-    throw new Error('TODO: implement migration in task 4');
+    return queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.createTable('cinemas', {
+        id: {
+          type: Sequelize.INTEGER,
+          primaryKey: true,
+          autoIncrement: true,
+        },
+        name: {
+          type: Sequelize.STRING,
+          allowNull: false,
+        },
+        address: {
+          type: Sequelize.STRING,
+          allowNull: false,
+        },
+        createdAt: {
+          type: Sequelize.DATE,
+          allowNull: false,
+        },
+        updatedAt: {
+          type: Sequelize.DATE,
+          allowNull: false,
+        },
+      }, { transaction });
+
+      await queryInterface.createTable('movies', {
+        id: {
+          type: Sequelize.INTEGER,
+          primaryKey: true,
+          autoIncrement: true,
+        },
+        title: {
+          type: Sequelize.STRING,
+          allowNull: false,
+        },
+        description: {
+          type: Sequelize.STRING,
+          allowNull: false,
+        },
+        createdAt: {
+          type: Sequelize.DATE,
+          allowNull: false,
+        },
+        updatedAt: {
+          type: Sequelize.DATE,
+          allowNull: false,
+        },
+      }, { transaction });
+
+      await queryInterface.createTable('showrooms', {
+        id: {
+          type: Sequelize.INTEGER,
+          primaryKey: true,
+          autoIncrement: true,
+        },
+        name: {
+          type: Sequelize.STRING,
+          allowNull: false,
+        },
+        cinemaId: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+          references: {
+            model: 'cinemas',
+            key: 'id',
+          },
+        },
+        createdAt: {
+          type: Sequelize.DATE,
+          allowNull: false,
+        },
+        updatedAt: {
+          type: Sequelize.DATE,
+          allowNull: false,
+        },
+      }, { transaction });
+
+      await queryInterface.createTable('shows', {
+        id: {
+          type: Sequelize.INTEGER,
+          primaryKey: true,
+          autoIncrement: true,
+        },
+        start: {
+          type: Sequelize.DATE,
+          allowNull: false,
+        },
+        end: {
+          type: Sequelize.DATE,
+          allowNull: false,
+        },
+        movieId: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+          references: {
+            model: 'movies',
+            key: 'id',
+          },
+        },
+        showroomId: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+          references: {
+            model: 'showrooms',
+            key: 'id',
+          },
+        },
+        createdAt: {
+          type: Sequelize.DATE,
   },
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
