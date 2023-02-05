@@ -2,6 +2,13 @@ import Event from './entities/event.entity';
 import Workshop from './entities/workshop.entity';
 import Sequelize, { Op } from 'sequelize';
 
+type EventWithWorkshops = {
+  id: number;
+  name: string;
+  createdAt: Date;
+  workshops: Workshop[];
+}
+
 
 export class EventsService {
 
@@ -86,7 +93,7 @@ export class EventsService {
     ```
      */
 
-  async getEventsWithWorkshops() {
+  async getEventsWithWorkshops() : Promise<EventWithWorkshops[]> {
     const events =  await Event.findAll({raw: true});
     const eventsWithWorkshops = await Promise.all(events.map(async event => {
       const workshops = await Workshop.findAll({raw: true, where: {eventId: event.id}})
@@ -172,5 +179,48 @@ export class EventsService {
     ]
     ```
      */
+    // const eventsWithWorkshops = await this.getEventsWithWorkshops()
+    // const futureEvents = eventsWithWorkshops.filter(event => {
+    //   console.log(new Date(event.workshops[0].start.trim()))
+
+    //   const match = /^(\d+)-(\d+)-(\d+)/.exec(event.workshops[0].start.trim())
+    //   // if (match) {
+    //   //   const start_date = new Date(match[1], match[2], match[3]);
+    //   // }
+
+    //   // console.log(new Date(event.workshops[0].start) > new Date())
+    //   return new Date(event.workshops[0].start) > new Date()
+    // })
+    // return futureEvents
+
+    // Return today's date and time
+    var currentDateTime = new Date()
+
+    // returns the month (from 0 to 11)
+    var month = currentDateTime.getMonth() + 1
+
+    // returns the day of the month (from 1 to 31)
+    var day = currentDateTime.getDate()
+
+    // returns the year (four digits)
+    var year = currentDateTime.getFullYear()
+
+    // write output MM/dd/yyyy
+    var formattedDate = year + "-" + month + "-" + day
+
+
+    return await Event.findAll({
+      raw: true,
+      include: [{
+        limit: 1,
+        model: Workshop,
+        as: 'workshops',
+        where: {
+          start: {
+            [Op.gt]: new Date()
+          }
+        }
+      }]
+    })
   }
 }
