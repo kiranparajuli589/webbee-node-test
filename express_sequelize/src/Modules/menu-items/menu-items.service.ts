@@ -1,3 +1,5 @@
+import MenuItem from "./entities/menu-item.entity"
+
 export class MenuItemsService {
 
   /* TODO: complete getMenuItems so that it returns a nested menu structure
@@ -76,6 +78,18 @@ export class MenuItemsService {
   */
 
   async getMenuItems() {
-    throw new Error('TODO in task 3');
+    const menuItems = await MenuItem.findAll({raw: true})
+    const rootMenuItems = menuItems.filter(menuItem => menuItem.parentId === null)
+    this.findChildrensRecursive(menuItems, rootMenuItems)
+  }
+
+  findChildrensRecursive(menuItems: any[], parentMenuItems: any[]) {
+    parentMenuItems.forEach(parentMenuItem => {
+      const childrens = menuItems.filter(menuItem => menuItem.parentId >= parentMenuItem.id)
+      if (childrens.length > 0) {
+        parentMenuItem.children = childrens
+        this.findChildrensRecursive(menuItems, childrens)
+      }
+    })
   }
 }
